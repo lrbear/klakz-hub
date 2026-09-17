@@ -31,7 +31,7 @@
             position: sticky; top: 0; z-index: 100;
         }
         .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
-        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav ul { display: flex; list-style: none; gap: 25px; align-items: center; }
         nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
         nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
@@ -50,6 +50,7 @@
             background: rgba(0, 255, 102, 0.1); color: #00ff66; border: 1px solid rgba(0, 255, 102, 0.3);
             box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
         }
+        .badge.offline { background: rgba(255, 51, 102, 0.1); color: #ff3366; border-color: rgba(255, 51, 102, 0.3); box-shadow: 0 0 10px rgba(255, 51, 102, 0.2); }
     </style>
 </head>
 <body>
@@ -62,6 +63,7 @@
                 <li><a href="key.html">Key System</a></li>
                 <li><a href="status.html" class="active">Status</a></li>
                 <li><a href="faq.html">FAQ</a></li>
+                <li><a href="admin.html" style="color: var(--neon-purple);">Admin</a></li>
             </ul>
         </nav>
     </header>
@@ -71,7 +73,7 @@
         <div class="status-list">
             <div class="status-item">
                 <span class="service-name">Ana Hub API (Vercel)</span>
-                <span class="badge">ÇEVRİMİÇİ</span>
+                <span id="apiBadge" class="badge">ÇEVRİMİÇİ</span>
             </div>
             <div class="status-item">
                 <span class="service-name">Key Doğrulama Sunucusu</span>
@@ -83,5 +85,15 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Admin panelinden yapılan değişikliği buraya yansıt
+        let savedStatus = localStorage.getItem("klakz_status_api") || "ÇEVRİMİÇİ";
+        let badge = document.getElementById('apiBadge');
+        badge.innerText = savedStatus;
+        if(savedStatus !== "ÇEVRİMİÇİ") {
+            badge.className = "badge offline";
+        }
+    </script>
 </body>
 </html>
