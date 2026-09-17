@@ -3,114 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key Sistemi - Klakz Hub</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title>Klakz Hub | Key System</title>
     <style>
-        .key-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
-        .key-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 35px; width: 100%; max-width: 420px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); display: flex; flex-direction: column; gap: 20px; }
-        .key-input { width: 100%; padding: 14px 18px; background: rgba(11, 12, 16, 0.6); border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 15px; outline: none; text-align: center; letter-spacing: 1px; font-weight: bold; }
-        .key-input:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
-        .btn-verify { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-        .btn-verify:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5); }
-        .btn-link { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text-muted); text-decoration: none; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 600; transition: 0.3s; display: block; }
-        .btn-link:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        :root {
+            --bg-color: #05050a;
+            --panel-bg: rgba(13, 13, 25, 0.7);
+            --neon-blue: #00f0ff;
+            --neon-purple: #b000ff;
+            --text-color: #ffffff;
+            --text-secondary: #8b8bb4;
+            --border-color: rgba(0, 240, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; position: relative; overflow-x: hidden; }
+
+        body::before {
+            content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: radial-gradient(circle, rgba(176,0,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(0,240,255,0.05) 10%, transparent 10%);
+            background-size: 30px 30px; animation: gridMove 20s linear infinite; z-index: -1;
+        }
+        @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 30px); } }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 50px;
+            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
+        nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+
+        .container { max-width: 600px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .key-box {
+            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 40px;
+            backdrop-filter: blur(15px); box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+        }
+        .key-box h1 { font-size: 28px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .key-box p { color: var(--text-secondary); margin-bottom: 30px; font-size: 16px; }
+
+        .btn {
+            padding: 14px 35px; border-radius: 8px; font-weight: bold; text-decoration: none; cursor: pointer; transition: 0.3s;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); color: #fff; border: none;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: inline-block; font-size: 16px;
+        }
+        .btn:hover { box-shadow: 0 0 25px var(--neon-blue), 0 0 35px var(--neon-purple); transform: scale(1.05); }
     </style>
 </head>
 <body>
-
-    <div class="announcement-bar" id="topAnnouncement">Yükleniyor...</div>
-
     <header>
         <div class="logo">KLAKZ HUB</div>
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
         <nav>
-            <a href="index.html">Ana Sayfa</a>
-            <a href="script.html">Scriptler</a>
-            <a href="status.html">Durum</a>
-            <a href="executors.html">Executor Rehberi</a>
-            <a href="network.html">Projelerim</a>
-            <a href="downloads.html">Uygulamalar</a>
-            <a href="key.html" class="active">Key Sistemi</a>
-            <a href="changelog.html">Güncellemeler</a>
-            <a href="request.html">İstek</a>
-            <a href="admin.html" style="color: var(--accent); font-weight: 700;">⚙️ Admin</a>
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="script.html">Scripts</a></li>
+                <li><a href="key.html" class="active">Key System</a></li>
+                <li><a href="status.html">Status</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+            </ul>
         </nav>
     </header>
 
-    <div class="container key-container">
-        <div class="key-card">
-            <h2 style="font-size: 24px; color: white;">Erişim <span>Key Doğrulama</span></h2>
-            <p style="color: var(--text-muted); font-size: 13px;">Siteye ve scriptlere erişim sağlamak için lütfen geçerli bir key girin.</p>
-            
-            <input type="text" id="userKeyInput" class="key-input" placeholder="KLAKZ-XXXX-XXXX">
-            <button class="btn-verify" onclick="verifyKey()">Key'i Doğrula</button>
-            
-            <a href="https://linkvertise.com" target="_blank" class="btn-link">🔑 Key Al (Linkvertise / Geçiş)</a>
+    <div class="container">
+        <div class="key-box">
+            <h1>Anahtar Doğrulama / Alma</h1>
+            <p>Scriptleri kullanabilmek için geçerli bir anahtara ihtiyacın var. Aşağıdaki butona tıklayarak anahtarınızı edinebilirsiniz.</p>
+            <a href="#" class="btn" onclick="alert('Key alma sayfasına yönlendiriliyorsunuz!')">KEY AL</a>
         </div>
     </div>
-
-    <div id="toast">Bildirim mesajı</div>
-    <footer><p>&copy; 2026 Klakz Hub. Tüm hakları saklıdır.</p></footer>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJuMNSxWFuNTO0xGriUo8QoaC9g-ie8WM",
-            authDomain: "klakz-database.firebaseapp.com",
-            databaseURL: "https://klakz-database-default-rtdb.firebaseio.com",
-            projectId: "klakz-database",
-            storageBucket: "klakz-database.firebasestorage.app",
-            messagingSenderId: "437747915577",
-            appId: "1:437747915577:web:f4ffa2f76d6d7a923966e8"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        db.ref('announcement').on('value', snap => { document.getElementById('topAnnouncement').textContent = snap.val() || ""; });
-
-        function verifyKey() {
-            let enteredKey = document.getElementById('userKeyInput').value.trim();
-            if(!enteredKey) {
-                showToast("❌ Lütfen bir key girin!");
-                return;
-            }
-
-            // Firebase'deki validKeys veritabanını kontrol et
-            db.ref('validKeys').once('value').then(snapshot => {
-                const keys = snapshot.val();
-                let isValid = false;
-
-                if(keys) {
-                    // Firebase içinde kayıtlı keyler arasında eşleşme arıyoruz
-                    Object.values(keys).forEach(k => {
-                        if(k === enteredKey) {
-                            isValid = true;
-                        }
-                    });
-                }
-
-                if(isValid) {
-                    sessionStorage.setItem('klakz_verified', 'true');
-                    showToast("✅ Key başarılı! Yönlendiriliyorsunuz...");
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1500);
-                } else {
-                    showToast("❌ Hatalı veya geçersiz key!");
-                }
-            }).catch(error => {
-                showToast("❌ Bağlantı hatası: " + error.message);
-            });
-        }
-
-        function toggleMenu() { document.querySelector('nav').classList.toggle('active'); }
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
-        }
-    </script>
 </body>
 </html>
