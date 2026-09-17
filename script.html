@@ -1,34 +1,13 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klakz Hub | Scripts</title>
-    <style>
-        /* Başlangıçta tüm içeriği gizle ki yetkisiz görünmesin */
-        #mainContent { display: none; }
-        /* ... diğer stillerin aynı kalabilir ... */
-    </style>
-</head>
-<body>
-    <!-- KONTROL SCRIPTİ -->
-    <script>
-        if (localStorage.getItem("klakz_verified") !== "true") {
+<script>
+    // Mobil tarayıcılarda localStorage engellense bile hata vermemesi için try-catch kullanıyoruz
+    try {
+        const verified = localStorage.getItem("klakz_verified");
+        if (verified !== "true") {
+            // Doğrulanmamışsa veya depolama kapalıysa key sayfasına fırlat
             window.location.replace("key.html");
-        } else {
-            // Eğer doğrulanmışsa içeriği göster
-            document.write('<style>#mainContent { display: block; }</style>');
         }
-    </script>
-
-    <div id="mainContent">
-        <!-- Bütün sayfa içeriğin buranın içinde olacak -->
-        <header>
-            <!-- Header kodların -->
-        </header>
-        <div class="container">
-            <!-- Geri kalan her şey buraya -->
-        </div>
-    </div>
-</body>
-</html>
+    } catch (e) {
+        // Hata alırsa (gizli sekme vb.) riske atmamak için yine key sayfasına gönder
+        window.location.replace("key.html");
+    }
+</script>
