@@ -3,84 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sık Sorulan Sorular - Klakz Hub</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title>Klakz Hub | FAQ</title>
     <style>
-        .faq-container { max-width: 800px; width: 100%; display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; }
-        .faq-card { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); padding: 20px 25px; border-radius: 16px; cursor: pointer; transition: 0.3s; }
-        .faq-card:hover { border-color: var(--primary); }
-        .faq-question { font-size: 18px; font-weight: 600; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .faq-answer { color: var(--text-muted); font-size: 14px; margin-top: 10px; line-height: 1.6; display: none; }
-        .faq-card.active .faq-answer { display: block; }
+        :root {
+            --bg-color: #05050a;
+            --panel-bg: rgba(13, 13, 25, 0.7);
+            --neon-blue: #00f0ff;
+            --neon-purple: #b000ff;
+            --text-color: #ffffff;
+            --text-secondary: #8b8bb4;
+            --border-color: rgba(0, 240, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; position: relative; overflow-x: hidden; }
+
+        body::before {
+            content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: radial-gradient(circle, rgba(176,0,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(0,240,255,0.05) 10%, transparent 10%);
+            background-size: 30px 30px; animation: gridMove 20s linear infinite; z-index: -1;
+        }
+        @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 30px); } }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 50px;
+            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
+        nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+
+        .container { max-width: 900px; margin: 50px auto; padding: 0 20px; }
+        .page-title { font-size: 32px; margin-bottom: 25px; text-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+
+        .faq-list { display: flex; flex-direction: column; gap: 15px; }
+        .faq-card {
+            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 25px;
+            backdrop-filter: blur(10px); transition: 0.3s;
+        }
+        .faq-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); }
+        .faq-card h3 { font-size: 18px; margin-bottom: 8px; color: var(--neon-blue); }
+        .faq-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
     </style>
 </head>
 <body>
-
-    <div class="announcement-bar" id="topAnnouncement">Yükleniyor...</div>
-
     <header>
         <div class="logo">KLAKZ HUB</div>
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
         <nav>
-            <a href="index.html">Ana Sayfa</a>
-            <a href="script.html">Scriptler</a>
-            <a href="status.html">Durum</a>
-            <a href="executors.html">Executor Rehberi</a>
-            <a href="network.html">Projelerim</a>
-            <a href="key.html">Key Sistemi</a>
-            <a href="changelog.html">Güncellemeler</a>
-            <a href="faq.html" class="active">SSS</a>
-            <a href="request.html">İstek</a>
-            <a href="admin.html" style="color: var(--accent); font-weight: 700;">⚙️ Admin</a>
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="script.html">Scripts</a></li>
+                <li><a href="key.html">Key System</a></li>
+                <li><a href="status.html">Status</a></li>
+                <li><a href="faq.html" class="active">FAQ</a></li>
+            </ul>
         </nav>
     </header>
 
-    <div class="container" style="justify-content: flex-start;">
-        <h1 style="font-size: 36px; margin-top: 20px;">Sık Sorulan <span>Sorular</span></h1>
-        <p style="margin-bottom: 30px; color: var(--text-muted);">Klakz Hub kullanımı, key sistemi ve scriptler hakkında merak edilenler.</p>
-
-        <div class="faq-container">
-            <div class="faq-card" onclick="toggleFaq(this)">
-                <div class="faq-question">🔑 Key sistemi nasıl çalışır ve ne kadar geçerlidir? <span>▼</span></div>
-                <div class="faq-answer">Key almak için "Key Sistemi" sayfasına gidip adımları tamamlamalısınız. Doğrulama yapıldıktan sonra key'iniz tarayıcınıza kaydedilir ve scriptlere sorunsuz erişim sağlarsınız.</div>
+    <div class="container">
+        <h1 class="page-title">Sıkça Sorulan Sorular</h1>
+        <div class="faq-list">
+            <div class="faq-card">
+                <h3>Klakz Hub güvenli mi?</h3>
+                <p>Evet, tüm scriptlerimiz ve sistemlerimiz güvenlik testlerinden geçirilmiştir ve tamamen zararsızdır.</p>
             </div>
-            <div class="faq-card" onclick="toggleFaq(this)">
-                <div class="faq-question">⚠️ Script çalışmıyor veya hata veriyor, ne yapmalıyım? <span>▼</span></div>
-                <div class="faq-answer">Oyun güncellendiğinde scriptler "Patch" (fix) yiyebilir. Scriptler sayfasından çalışmayan scriptler için "Patlak Bildir" butonunu kullanarak yöneticiye haber verebilirsiniz.</div>
+            <div class="faq-card">
+                <h3>Hangi executorlar destekleniyor?</h3>
+                <p>Güncel ve güçlü tüm popüler script executorlar (Synapse Z, KRNL, Delta vb.) tam olarak desteklenmektedir.</p>
             </div>
-            <div class="faq-card" onclick="toggleFaq(this)">
-                <div class="faq-question">💻 Hangi Executor'ları kullanmalıyım? <span>▼</span></div>
-                <div class="faq-answer">Güncel ve güvenli executor durumları için üst menüdeki "Executor Rehberi" sayfasını inceleyebilirsiniz.</div>
+            <div class="faq-card">
+                <h3>Key ne kadar süre geçerlidir?</h3>
+                <p>Aldığınız anahtarlar genellikle 24 saat boyunca kesintisiz kullanım sunar.</p>
             </div>
         </div>
     </div>
-
-    <div id="toast">Bildirim mesajı</div>
-    <footer><p>&copy; 2026 Klakz Hub. Tüm hakları saklıdır.</p></footer>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJuMNSxWFuNTO0xGriUo8QoaC9g-ie8WM",
-            authDomain: "klakz-database.firebaseapp.com",
-            databaseURL: "https://klakz-database-default-rtdb.firebaseio.com",
-            projectId: "klakz-database",
-            storageBucket: "klakz-database.firebasestorage.app",
-            messagingSenderId: "437747915577",
-            appId: "1:437747915577:web:f4ffa2f76d6d7a923966e8"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        window.addEventListener('DOMContentLoaded', () => {
-            db.ref('announcement').on('value', snap => {
-                document.getElementById('topAnnouncement').textContent = snap.val() || "";
-            });
-        });
-
-        function toggleFaq(card) { card.classList.toggle('active'); }
-        function toggleMenu() { document.querySelector('nav').classList.toggle('active'); }
-    </script>
 </body>
 </html>
