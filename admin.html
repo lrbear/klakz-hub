@@ -31,20 +31,18 @@
             position: sticky; top: 0; z-index: 100;
         }
         .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
-        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav ul { display: flex; list-style: none; gap: 25px; align-items: center; }
         nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
         nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
         .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
         .page-title { font-size: 32px; margin-bottom: 25px; text-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
 
-        /* Login Ekranı */
         #loginSection {
             background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 40px; text-align: center; backdrop-filter: blur(15px); max-width: 500px; margin: 100px auto;
         }
         #loginSection h2 { margin-bottom: 20px; }
 
-        /* Yönetim Paneli İçeriği */
         #adminPanel { display: none; }
         .admin-card {
             background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px;
@@ -70,7 +68,6 @@
     </style>
 </head>
 <body>
-
     <header>
         <div class="logo">KLAKZ HUB - ADMIN</div>
         <nav>
@@ -79,7 +76,8 @@
                 <li><a href="script.html">Scripts</a></li>
                 <li><a href="key.html">Key System</a></li>
                 <li><a href="status.html">Status</a></li>
-                <li><a href="admin.html" class="active">Admin Panel</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li><a href="admin.html" class="active" style="color: var(--neon-purple);">Admin</a></li>
             </ul>
         </nav>
     </header>
@@ -89,18 +87,18 @@
         <div id="loginSection">
             <h2>Admin Girişi</h2>
             <p style="color: var(--text-secondary); margin-bottom: 20px;">Yönetim paneline erişmek için şifrenizi girin.</p>
-            <input type="password" id="adminPassword" class="form-control" placeholder="Admin Şifresi..." style="margin-bottom: 15px;">
+            <input type="password" id="adminPassword" class="form-control" placeholder="Admin Şifresi (klakz123)..." style="margin-bottom: 15px;">
             <button class="btn" onclick="checkAdminPassword()">Giriş Yap</button>
-            <div id="loginError" class="error">Hatalı şifre!</div>
+            <div id="loginError" class="error">Hatalı şifre! (Varsayılan: klakz123)</div>
         </div>
 
-        <!-- YÖNETİM PANELİ ANA GÖVDE -->
+        <!-- YÖNETİM PANELİ -->
         <div id="adminPanel">
             <h1 class="page-title">Yönetim Paneli</h1>
 
-            <!-- 1. KEY SİSTEMİ YÖNETİMİ -->
+            <!-- 1. KEY SİSTEMİ -->
             <div class="admin-card">
-                <h3>Key Şifresini Değiştir</h3>
+                <h3>Key Sisteminin Şifresini Değiştir</h3>
                 <div class="form-group">
                     <label>Yeni Geçerli Key:</label>
                     <input type="text" id="newKeyInput" class="form-control" placeholder="Örn: KLAKZ-YENI-KEY">
@@ -108,7 +106,7 @@
                 <button class="btn" onclick="updateKey()">Key'i Güncelle</button>
             </div>
 
-            <!-- 2. SİSTEM DURUMU (STATUS) YÖNETİMİ -->
+            <!-- 2. STATUS YÖNETİMİ -->
             <div class="admin-card">
                 <h3>Sistem Durumunu Değiştir (Status)</h3>
                 <div class="form-group">
@@ -122,7 +120,7 @@
                 <button class="btn" onclick="updateStatus()">Durumu Güncelle</button>
             </div>
 
-            <!-- 3. YENİ SCRİPT EKLEME -->
+            <!-- 3. SCRİPT EKLEME -->
             <div class="admin-card">
                 <h3>Yeni Script Ekle</h3>
                 <div class="form-group">
@@ -143,7 +141,6 @@
     </div>
 
     <script>
-        // Varsayılan Admin Şifresi (İstediğin gibi değiştirebilirsin)
         const ADMIN_SECRET = "klakz123";
 
         function checkAdminPassword() {
@@ -156,7 +153,6 @@
             }
         }
 
-        // Key Güncelleme Fonksiyonu
         function updateKey() {
             let newKey = document.getElementById('newKeyInput').value.trim();
             if (newKey) {
@@ -168,14 +164,12 @@
             }
         }
 
-        // Status Güncelleme Fonksiyonu
         function updateStatus() {
             let apiStatus = document.getElementById('statusApi').value;
             localStorage.setItem("klakz_status_api", apiStatus);
             alert("Sistem durumu güncellendi: " + apiStatus);
         }
 
-        // Script Ekleme Fonksiyonu
         function addNewScript() {
             let title = document.getElementById('scriptTitle').value;
             let desc = document.getElementById('scriptDesc').value;
@@ -186,7 +180,7 @@
                 scripts.push({ title, desc, code });
                 localStorage.setItem("klakz_custom_scripts", JSON.stringify(scripts));
                 
-                alert("Yeni script başarıyla eklendi!");
+                alert("Yeni script başarıyla eklendi ve arşive yansıtıldı!");
                 document.getElementById('scriptTitle').value = '';
                 document.getElementById('scriptDesc').value = '';
                 document.getElementById('scriptCode').value = '';
