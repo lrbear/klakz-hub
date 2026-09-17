@@ -3,127 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Klakz Hub - Ana Sayfa</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title>Klakz Hub | Next-Gen Panel</title>
     <style>
-        .hero { text-align: center; max-width: 800px; margin: 60px 0; }
-        .hero h1 { font-size: 48px; font-weight: 800; margin-bottom: 20px; line-height: 1.2; }
-        .hero h1 span { background: linear-gradient(45deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-muted); font-size: 18px; margin-bottom: 30px; }
-        .stats-box { display: flex; gap: 20px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
-        .stat-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px 30px; border-radius: 16px; backdrop-filter: blur(10px); min-width: 180px; text-align: center; }
-        .stat-card h3 { font-size: 28px; color: var(--primary); margin-bottom: 5px; }
-        .stat-card p { font-size: 13px; color: var(--text-muted); }
-        .music-widget { position: fixed; bottom: 30px; left: 30px; background: var(--card-bg); border: 1px solid var(--border); padding: 12px 18px; border-radius: 30px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .music-widget button { background: var(--primary); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        :root {
+            --bg-color: #05050a;
+            --panel-bg: rgba(13, 13, 25, 0.7);
+            --neon-blue: #00f0ff;
+            --neon-purple: #b000ff;
+            --text-color: #ffffff;
+            --text-secondary: #8b8bb4;
+            --border-color: rgba(0, 240, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Arka Planda Hareketli Cyber Grid Efekti */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image: 
+                radial-gradient(circle, rgba(176,0,255,0.08) 10%, transparent 10%),
+                radial-gradient(circle, rgba(0,240,255,0.05) 10%, transparent 10%);
+            background-size: 30px 30px;
+            background-position: 0 0;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        /* Navigasyon Barı */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: rgba(5, 5, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: var(--neon-blue);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        /* Ana İçerik Alanı */
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .hero-section {
+            padding: 60px 20px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 240, 255, 0.05);
+            animation: floatCard 6s ease-in-out infinite;
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .hero-section h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-section p {
+            color: var(--text-secondary);
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        /* Neon Butonlar */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 25px var(--neon-blue), 0 0 35px var(--neon-purple);
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* İstatistik Kartları Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
     </style>
 </head>
 <body>
 
-    <div class="announcement-bar" id="topAnnouncement">Yükleniyor...</div>
-
     <header>
         <div class="logo">KLAKZ HUB</div>
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
         <nav>
-            <a href="index.html" class="active">Ana Sayfa</a>
-            <a href="script.html">Scriptler</a>
-            <a href="status.html">Durum</a>
-            <a href="executors.html">Executor Rehberi</a>
-            <a href="network.html">Projelerim</a>
-            <a href="key.html">Key Sistemi</a>
-            <a href="changelog.html">Güncellemeler</a>
-            <a href="faq.html">SSS</a>
-            <a href="request.html">İstek</a>
-            <a href="admin.html" style="color: var(--accent); font-weight: 700;">⚙️ Admin</a>
+            <ul>
+                <li><a href="index.html" class="active">Ana Sayfa</a></li>
+                <li><a href="script.html">Scripts</a></li>
+                <li><a href="key.html">Key System</a></li>
+                <li><a href="status.html">Status</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+            </ul>
         </nav>
     </header>
 
     <div class="container">
-        <div class="hero">
-            <h1>Türkiye'nin En Güvenilir <span>Script Hub Platformu</span></h1>
-            <p>Roblox oyunları için en güncel, optimize edilmiş ve ban riskini en aza indiren Lua scriptlerine anında ulaşın.</p>
-            <a href="script.html" style="background: var(--primary); color: white; padding: 14px 30px; border-radius: 12px; text-decoration: none; font-weight: 700; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4); display: inline-block;">🚀 Scriptleri Keşfet</a>
+        <div class="hero-section">
+            <h1>GELECEĞİN KONTROL PANELİ</h1>
+            <p>En hızlı, güvenli ve şık deneyim için Klakz Hub sistemlerini keşfet.</p>
+            <div class="btn-group">
+                <a href="script.html" class="btn btn-primary">Scriptleri Gör</a>
+                <a href="key.html" class="btn btn-secondary">Key Al</a>
+            </div>
+        </div>
 
-            <div class="stats-box">
-                <div class="stat-card">
-                    <h3 id="onlineCount">1</h3>
-                    <p>🟢 Çevrimiçi Kullanıcı</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="totalScripts">0</h3>
-                    <p>📜 Aktif Script</p>
-                </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Sistem Durumu</h3>
+                <div class="value" style="color: #00ff66; text-shadow: 0 0 10px rgba(0,255,102,0.4);">ÇEVRİMİÇİ</div>
+            </div>
+            <div class="stat-card">
+                <h3>Aktif Kullanıcı</h3>
+                <div class="value">1,428</div>
+            </div>
+            <div class="stat-card">
+                <h3>Toplam Script</h3>
+                <div class="value">34+</div>
             </div>
         </div>
     </div>
 
-    <!-- Lo-Fi Müzikçalar Widget -->
-    <div class="music-widget">
-        <span style="font-size: 13px; font-weight: 600;">🎵 Lo-Fi Beats</span>
-        <button id="playMusicBtn" onclick="toggleMusic()">▶</button>
-        <audio id="bgMusic" loop src="https://stream.zeno.fm/f3wvbbqmdg8uv"></audio>
-    </div>
-
-    <div id="toast">Bildirim mesajı</div>
-    <footer><p>&copy; 2026 Klakz Hub. Tüm hakları saklıdır.</p></footer>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJuMNSxWFuNTO0xGriUo8QoaC9g-ie8WM",
-            authDomain: "klakz-database.firebaseapp.com",
-            databaseURL: "https://klakz-database-default-rtdb.firebaseio.com",
-            projectId: "klakz-database",
-            storageBucket: "klakz-database.firebasestorage.app",
-            messagingSenderId: "437747915577",
-            appId: "1:437747915577:web:f4ffa2f76d6d7a923966e8"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // Duyuruyu Çek
-        db.ref('announcement').on('value', snap => {
-            document.getElementById('topAnnouncement').textContent = snap.val() || "";
-        });
-
-        // Toplam Script Sayısı
-        db.ref('scripts').on('value', snap => {
-            document.getElementById('totalScripts').textContent = snap.numChildren() || 0;
-        });
-
-        // --- GERÇEK ANLIK ÇEVRİMİÇİ (ONLINE) KULLANICI SİSTEMİ ---
-        const myConnectionRef = db.ref('stats/connections/' + db.ref().push().key);
-        db.ref('.info/connected').on('value', snap => {
-            if (snap.val() === true) {
-                myConnectionRef.onDisconnect().remove();
-                myConnectionRef.set(true);
-            }
-        });
-        db.ref('stats/connections').on('value', snap => {
-            let count = snap.numChildren();
-            document.getElementById('onlineCount').textContent = count > 0 ? count : 1;
-        });
-
-        // Müzikçalar Fonksiyonu
-        let isPlaying = false;
-        function toggleMusic() {
-            const audio = document.getElementById('bgMusic');
-            const btn = document.getElementById('playMusicBtn');
-            if(isPlaying) {
-                audio.pause();
-                btn.textContent = "▶";
-                isPlaying = false;
-            } else {
-                audio.play().catch(() => {});
-                btn.textContent = "❚❚";
-                isPlaying = true;
-            }
-        }
-
-        function toggleMenu() { document.querySelector('nav').classList.toggle('active'); }
-    </script>
 </body>
 </html>
