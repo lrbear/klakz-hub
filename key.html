@@ -31,7 +31,7 @@
             position: sticky; top: 0; z-index: 100;
         }
         .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
-        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav ul { display: flex; list-style: none; gap: 25px; align-items: center; }
         nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
         nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
@@ -49,26 +49,15 @@
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: inline-block; font-size: 15px; margin-bottom: 20px;
         }
         .btn:hover { box-shadow: 0 0 25px var(--neon-blue), 0 0 35px var(--neon-purple); transform: scale(1.03); }
+        .btn-discord { background: #5865F2; box-shadow: 0 0 15px rgba(88, 101, 242, 0.4); margin-bottom: 25px; }
+        .btn-discord:hover { box-shadow: 0 0 25px #5865F2; }
 
-        .btn-discord {
-            background: #5865F2;
-            box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
-            margin-bottom: 25px;
-        }
-        .btn-discord:hover {
-            box-shadow: 0 0 25px #5865F2;
-        }
-
-        .divider {
-            height: 1px; width: 100%; background: var(--border-color); margin: 20px 0;
-        }
-
+        .divider { height: 1px; width: 100%; background: var(--border-color); margin: 20px 0; }
         .key-input {
             width: 100%; padding: 14px 20px; background: rgba(5, 5, 10, 0.6); border: 1px solid var(--border-color);
             border-radius: 8px; color: #fff; font-size: 16px; margin-bottom: 15px; outline: none; text-align: center; transition: 0.3s;
         }
         .key-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
-
         .error-msg { color: #ff3366; font-size: 14px; margin-top: 10px; display: none; text-shadow: 0 0 10px rgba(255,51,102,0.4); }
     </style>
 </head>
@@ -82,6 +71,7 @@
                 <li><a href="key.html" class="active">Key System</a></li>
                 <li><a href="status.html">Status</a></li>
                 <li><a href="faq.html">FAQ</a></li>
+                <li><a href="admin.html" style="color: var(--neon-purple);">Admin</a></li>
             </ul>
         </nav>
     </header>
@@ -91,36 +81,30 @@
             <h1>Key Doğrulama Sistemi</h1>
             <p>Scriptlere erişim sağlamak için önce Discord sunucumuzdan anahtar almanız gerekmektedir.</p>
             
-            <!-- Discord'a Yönlendirme Butonu (Buraya kendi Discord davet linkini yazabilirsin) -->
             <a href="https://discord.gg/senin-discord-davet-linkin" target="_blank" class="btn btn-discord">1. Discord'a Git & Key Al</a>
 
             <div class="divider"></div>
 
             <p style="margin-bottom: 15px;">Aldığın Key'i buraya gir ve kilidi aç:</p>
-            
             <input type="text" id="keyInput" class="key-input" placeholder="Key'i buraya yapıştır...">
             <button class="btn" onclick="checkKey()">Key'i Doğrula</button>
-            
             <div id="errorMsg" class="error-msg">Geçersiz veya hatalı key! Lütfen tekrar dene.</div>
         </div>
     </div>
 
     <script>
         function checkKey() {
-            const userKey = document.getElementById('keyInput').value.trim();
-            const correctKey = "KLAKZ-2026-SECRET"; // Buraya geçerli olmasını istediğin anahtarı yazabilirsin
-            const errorMsg = document.getElementById('errorMsg');
+            let userKey = document.getElementById('keyInput').value.trim();
+            // Admin panelinden güncellenen key'i okur, yoksa varsayılanı kullanır
+            let correctKey = localStorage.getItem("klakz_correct_key") || "KLAKZ-2026-SECRET";
+            let errorMsg = document.getElementById('errorMsg');
 
             if (userKey === correctKey) {
-                // Key doğruysa tarayıcı hafızasına yetki verildiğini kaydet ve script sayfasına at
                 localStorage.setItem("klakz_verified", "true");
                 window.location.href = "script.html";
             } else {
-                // Key yanlışsa hata mesajını göster
                 errorMsg.style.display = "block";
-                setTimeout(() => {
-                    errorMsg.style.display = "none";
-                }, 3000);
+                setTimeout(() => { errorMsg.style.display = "none"; }, 3000);
             }
         }
     </script>
