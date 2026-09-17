@@ -18,7 +18,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; position: relative; overflow-x: hidden; }
 
-        /* Arka Planda Hareketli Cyber Grid Efekti */
         body::before {
             content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
             background-image: radial-gradient(circle, rgba(176,0,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(0,240,255,0.05) 10%, transparent 10%);
@@ -26,22 +25,16 @@
         }
         @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 30px); } }
 
-        /* Navigasyon Barı */
         header {
             display: flex; justify-content: space-between; align-items: center; padding: 20px 50px;
             background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
             position: sticky; top: 0; z-index: 100;
         }
         .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
-        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav ul { display: flex; list-style: none; gap: 25px; align-items: center; }
         nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
         nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
-        nav a::after {
-            content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background: var(--neon-blue); transition: width 0.3s; box-shadow: 0 0 10px var(--neon-blue);
-        }
-        nav a:hover::after, nav a.active::after { width: 100%; }
 
-        /* Ana İçerik */
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .page-title { font-size: 32px; text-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
@@ -52,7 +45,6 @@
         }
         .search-box:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
 
-        /* Script Kartları Grid */
         .script-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .script-card {
             background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px;
@@ -75,8 +67,6 @@
     </style>
 </head>
 <body>
-
-    <!-- GÜVENLİK KONTROLÜ: Key girmeden gelenleri direkt key sayfasına geri yollar -->
     <script>
         if (localStorage.getItem("klakz_verified") !== "true") {
             window.location.href = "key.html";
@@ -92,6 +82,7 @@
                 <li><a href="key.html">Key System</a></li>
                 <li><a href="status.html">Status</a></li>
                 <li><a href="faq.html">FAQ</a></li>
+                <li><a href="admin.html" style="color: var(--neon-purple);">Admin</a></li>
             </ul>
         </nav>
     </header>
@@ -99,54 +90,68 @@
     <div class="container">
         <div class="page-header">
             <h1 class="page-title">Script Arşivi</h1>
-            <!-- İsteğe bağlı çıkış yapma butonu -->
             <button class="logout-btn" onclick="logout()">Kilidi Kapat (Çıkış Yap)</button>
         </div>
 
         <input type="text" class="search-box" id="searchInput" placeholder="Script ara..." onkeyup="searchScript()">
         
         <div class="script-grid" id="scriptGrid">
+            <!-- Varsayılan Sabit Scriptler -->
             <div class="script-card">
                 <div>
                     <h3>Universal Hub V1</h3>
                     <p>Tüm oyunlarda geçerli optimize edilmiş gelişmiş kontrol ve hile scripti.</p>
                 </div>
-                <button class="btn-copy" onclick="copyScript('loadstring(game:HttpGet(\"https://klakzhub.vercel.app/hub.lua\"))()')">Scripti Kopyala</button>
+                <button class="btn-copy" onclick="copyScript('print(\"Universal Hub V1 Loaded\")')">Scripti Kopyala</button>
             </div>
-
             <div class="script-card">
                 <div>
                     <h3>Blox Fruits & Combat</h3>
                     <p>Otomatik farm, Boss bulucu ve PVP için optimize edilmiş özel script.</p>
                 </div>
-                <button class="btn-copy" onclick="copyScript('print(\"Klakz Hub Blox Fruits Loaded\")')">Scripti Kopyala</button>
+                <button class="btn-copy" onclick="copyScript('print(\"Blox Fruits Loaded\")')">Scripti Kopyala</button>
             </div>
-
             <div class="script-card">
                 <div>
                     <h3>Roblox Arsenal Aimbot</h3>
                     <p>Gelişmiş FOV çemberi, silent aim ve ESP özellikleri içeren script.</p>
                 </div>
-                <button class="btn-copy" onclick="copyScript('print(\"Klakz Hub Arsenal Loaded\")')">Scripti Kopyala</button>
+                <button class="btn-copy" onclick="copyScript('print(\"Arsenal Loaded\")')">Scripti Kopyala</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Kopyalama fonksiyonu ve bildirim
+        // Admin panelinden eklenen özel scriptleri otomatik olarak sayfaya ekle
+        window.addEventListener('DOMContentLoaded', () => {
+            let customScripts = JSON.parse(localStorage.getItem("klakz_custom_scripts")) || [];
+            let grid = document.getElementById('scriptGrid');
+
+            customScripts.forEach(item => {
+                let card = document.createElement('div');
+                card.className = 'script-card';
+                card.innerHTML = `
+                    <div>
+                        <h3>${item.title}</h3>
+                        <p>${item.desc}</p>
+                    </div>
+                    <button class="btn-copy" onclick="copyScript('${item.code.replace(/'/g, "\\'")}')">Scripti Kopyala</button>
+                `;
+                grid.appendChild(card);
+            });
+        });
+
         function copyScript(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert("Script başarıyla panoya kopyalandı!");
             });
         }
 
-        // Çıkış yapma fonksiyonu (Key doğrulamasını sıfırlar)
         function logout() {
             localStorage.removeItem("klakz_verified");
             window.location.href = "key.html";
         }
 
-        // Arama filtresi
         function searchScript() {
             let input = document.getElementById('searchInput').value.toLowerCase();
             let cards = document.getElementsByClassName('script-card');
@@ -154,7 +159,6 @@
             for (let i = 0; i < cards.length; i++) {
                 let title = cards[i].getElementsByTagName('h3')[0].innerText.toLowerCase();
                 let desc = cards[i].getElementsByTagName('p')[0].innerText.toLowerCase();
-
                 if (title.includes(input) || desc.includes(input)) {
                     cards[i].style.display = "flex";
                 } else {
