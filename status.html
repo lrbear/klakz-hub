@@ -3,104 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Durum - Klakz Hub</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script>
-        let isVerified = localStorage.getItem('klakz_verified');
-        let expireTime = localStorage.getItem('klakz_expire');
-        let now = new Date().getTime();
-        if (!isVerified || !expireTime || now > parseInt(expireTime)) {
-            localStorage.removeItem('klakz_verified');
-            localStorage.removeItem('klakz_expire');
-            window.location.href = 'key.html';
-        }
-    </script>
+    <title>Klakz Hub | Status</title>
     <style>
-        .status-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 800px; }
-        .status-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
-        .badge { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; }
-        .badge.working { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge.updating { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge.patched { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        :root {
+            --bg-color: #05050a;
+            --panel-bg: rgba(13, 13, 25, 0.7);
+            --neon-blue: #00f0ff;
+            --neon-purple: #b000ff;
+            --text-color: #ffffff;
+            --text-secondary: #8b8bb4;
+            --border-color: rgba(0, 240, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; position: relative; overflow-x: hidden; }
+
+        body::before {
+            content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: radial-gradient(circle, rgba(176,0,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(0,240,255,0.05) 10%, transparent 10%);
+            background-size: 30px 30px; animation: gridMove 20s linear infinite; z-index: -1;
+        }
+        @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 30px); } }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 50px;
+            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
+        nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+
+        .container { max-width: 900px; margin: 50px auto; padding: 0 20px; }
+        .page-title { font-size: 32px; margin-bottom: 25px; text-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+
+        .status-list { display: flex; flex-direction: column; gap: 15px; }
+        .status-item {
+            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 25px;
+            backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+        }
+        .status-item:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 240, 255, 0.2); }
+        .service-name { font-size: 18px; font-weight: bold; }
+        .badge {
+            padding: 6px 15px; border-radius: 20px; font-size: 14px; font-weight: bold;
+            background: rgba(0, 255, 102, 0.1); color: #00ff66; border: 1px solid rgba(0, 255, 102, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+        }
     </style>
 </head>
 <body>
-
-    <div class="announcement-bar" id="topAnnouncement">Yükleniyor...</div>
-
     <header>
         <div class="logo">KLAKZ HUB</div>
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
         <nav>
-            <a href="index.html">Ana Sayfa</a>
-            <a href="script.html">Scriptler</a>
-            <a href="status.html" class="active">Durum</a>
-            <a href="executors.html">Executor Rehberi</a>
-            <a href="network.html">Projelerim</a>
-            <a href="key.html">Key Sistemi</a>
-            <a href="changelog.html">Güncellemeler</a>
-            <a href="request.html">İstek</a>
-            <a href="admin.html" style="color: var(--accent); font-weight: 700;">⚙️ Admin</a>
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="script.html">Scripts</a></li>
+                <li><a href="key.html">Key System</a></li>
+                <li><a href="status.html" class="active">Status</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+            </ul>
         </nav>
     </header>
 
-    <div class="container" style="align-items: center;">
-        <h1 style="font-size: 36px; margin-bottom: 10px;">Sistem ve Executor <span>Durumu</span></h1>
-        <p style="color: var(--text-muted); margin-bottom: 30px; text-align: center;">Admin paneli tarafından güncellenen anlık çalışma durumları.</p>
-
-        <div class="status-grid" id="statusGrid">
-            <p style="color: var(--text-muted); text-align: center;">Durumlar yükleniyor...</p>
+    <div class="container">
+        <h1 class="page-title">Sistem Durumu</h1>
+        <div class="status-list">
+            <div class="status-item">
+                <span class="service-name">Ana Hub API (Vercel)</span>
+                <span class="badge">ÇEVRİMİÇİ</span>
+            </div>
+            <div class="status-item">
+                <span class="service-name">Key Doğrulama Sunucusu</span>
+                <span class="badge">ÇEVRİMİÇİ</span>
+            </div>
+            <div class="status-item">
+                <span class="service-name">Script Güncelleme Servisi</span>
+                <span class="badge">ÇEVRİMİÇİ</span>
+            </div>
         </div>
     </div>
-
-    <div id="toast">Bildirim mesajı</div>
-    <footer><p>&copy; 2026 Klakz Hub. Tüm hakları saklıdır.</p></footer>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJuMNSxWFuNTO0xGriUo8QoaC9g-ie8WM",
-            authDomain: "klakz-database.firebaseapp.com",
-            databaseURL: "https://klakz-database-default-rtdb.firebaseio.com",
-            projectId: "klakz-database",
-            storageBucket: "klakz-database.firebasestorage.app",
-            messagingSenderId: "437747915577",
-            appId: "1:437747915577:web:f4ffa2f76d6d7a923966e8"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        db.ref('announcement').on('value', snap => {
-            document.getElementById('topAnnouncement').textContent = snap.val() || "";
-        });
-
-        db.ref('statuses').on('value', snap => {
-            const data = snap.val();
-            const grid = document.getElementById('statusGrid');
-            grid.innerHTML = "";
-
-            if(!data) {
-                grid.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Henüz durum verisi girilmemiş.</p>';
-                return;
-            }
-
-            Object.keys(data).forEach(key => {
-                let st = data[key];
-                let badgeClass = "working";
-                if(st.state.includes("Güncelleniyor")) badgeClass = "updating";
-                if(st.state.includes("Patlak")) badgeClass = "patched";
-
-                grid.innerHTML += `
-                    <div class="status-card">
-                        <strong style="color: white; font-size: 16px;">${st.name}</strong>
-                        <span class="badge ${badgeClass}">${st.state}</span>
-                    </div>
-                `;
-            });
-        });
-
-        function toggleMenu() { document.querySelector('nav').classList.toggle('active'); }
-    </script>
 </body>
 </html>
