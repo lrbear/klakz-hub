@@ -3,346 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Paneli - Klakz Hub</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <title>Klakz Hub | Admin Panel</title>
     <style>
-        .admin-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 25px; width: 100%; max-width: 800px; margin-bottom: 25px; backdrop-filter: blur(10px); display: flex; flex-direction: column; gap: 15px; }
-        .admin-input { width: 100%; padding: 12px 18px; background: rgba(11, 12, 16, 0.6); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 14px; outline: none; }
-        .admin-input:focus { border-color: var(--primary); }
-        .admin-btn { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s ease; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); text-align: center; }
-        .admin-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5); }
-        .admin-btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
-        .admin-btn-danger:hover { box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5); }
-        .list-item { background: rgba(11, 12, 16, 0.4); border: 1px solid var(--border); padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        :root {
+            --bg-color: #05050a;
+            --panel-bg: rgba(13, 13, 25, 0.7);
+            --neon-blue: #00f0ff;
+            --neon-purple: #b000ff;
+            --text-color: #ffffff;
+            --text-secondary: #8b8bb4;
+            --border-color: rgba(0, 240, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; position: relative; overflow-x: hidden; }
+
+        body::before {
+            content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: radial-gradient(circle, rgba(176,0,255,0.08) 10%, transparent 10%), radial-gradient(circle, rgba(0,240,255,0.05) 10%, transparent 10%);
+            background-size: 30px 30px; animation: gridMove 20s linear infinite; z-index: -1;
+        }
+        @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 30px); } }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 50px;
+            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: 800; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+        nav ul { display: flex; list-style: none; gap: 25px; }
+        nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
+        nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .page-title { font-size: 32px; margin-bottom: 25px; text-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+
+        /* Login Ekranı */
+        #loginSection {
+            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 40px; text-align: center; backdrop-filter: blur(15px); max-width: 500px; margin: 100px auto;
+        }
+        #loginSection h2 { margin-bottom: 20px; }
+
+        /* Yönetim Paneli İçeriği */
+        #adminPanel { display: none; }
+        .admin-card {
+            background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px;
+            backdrop-filter: blur(10px); margin-bottom: 25px;
+        }
+        .admin-card h3 { font-size: 20px; margin-bottom: 15px; color: var(--neon-blue); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; color: var(--text-secondary); margin-bottom: 5px; font-size: 14px; }
+        .form-control {
+            width: 100%; padding: 12px 15px; background: rgba(5, 5, 10, 0.6); border: 1px solid var(--border-color);
+            border-radius: 8px; color: #fff; font-size: 15px; outline: none; transition: 0.3s;
+        }
+        .form-control:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+
+        .btn {
+            padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); color: #fff; border: none;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); font-size: 15px;
+        }
+        .btn:hover { box-shadow: 0 0 25px var(--neon-blue); transform: scale(1.02); }
+        .error { color: #ff3366; margin-top: 10px; font-size: 14px; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="announcement-bar" id="topAnnouncement">Yükleniyor...</div>
-
     <header>
-        <div class="logo">KLAKZ HUB</div>
-        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        <div class="logo">KLAKZ HUB - ADMIN</div>
         <nav>
-            <a href="index.html">Ana Sayfa</a>
-            <a href="script.html">Scriptler</a>
-            <a href="status.html">Durum</a>
-            <a href="executors.html">Executor Rehberi</a>
-            <a href="network.html">Projelerim</a>
-            <a href="downloads.html">Uygulamalar</a>
-            <a href="key.html">Key Sistemi</a>
-            <a href="changelog.html">Güncellemeler</a>
-            <a href="request.html">İstek</a>
-            <a href="admin.html" class="active" style="color: var(--accent); font-weight: 700;">⚙️ Admin</a>
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="script.html">Scripts</a></li>
+                <li><a href="key.html">Key System</a></li>
+                <li><a href="status.html">Status</a></li>
+                <li><a href="admin.html" class="active">Admin Panel</a></li>
+            </ul>
         </nav>
     </header>
 
-    <div class="container" style="align-items: center;">
-        <h1 style="font-size: 36px; margin-bottom: 25px;">Yönetici <span>Paneli</span></h1>
-
-        <!-- Duyuru Yönetimi -->
-        <div class="admin-section">
-            <h3>📢 Site Duyurusu Düzenle</h3>
-            <input type="text" id="announcementInput" class="admin-input" placeholder="Yeni duyuru metnini yazın...">
-            <button class="admin-btn" onclick="updateAnnouncement()">Duyuruyu Güncelle</button>
+    <div class="container">
+        <!-- ŞİFRE GİRİŞ EKRANI -->
+        <div id="loginSection">
+            <h2>Admin Girişi</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">Yönetim paneline erişmek için şifrenizi girin.</p>
+            <input type="password" id="adminPassword" class="form-control" placeholder="Admin Şifresi..." style="margin-bottom: 15px;">
+            <button class="btn" onclick="checkAdminPassword()">Giriş Yap</button>
+            <div id="loginError" class="error">Hatalı şifre!</div>
         </div>
 
-        <!-- Key Yönetimi -->
-        <div class="admin-section">
-            <h3>🔑 Yeni Erişim Key'i Oluştur</h3>
-            <input type="text" id="keyInput" class="admin-input" placeholder="Örn: KLAKZ-VIP-2026 (Boş bırakırsan rastgele üretilir)">
-            <button class="admin-btn" onclick="generateKey()">Key Üret ve Kaydet</button>
-        </div>
-        <div class="admin-section">
-            <h3>📋 Aktif Key Listesi</h3>
-            <div id="adminKeysList" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: var(--text-muted); text-align: center;">Keyler yükleniyor...</p>
-            </div>
-        </div>
+        <!-- YÖNETİM PANELİ ANA GÖVDE -->
+        <div id="adminPanel">
+            <h1 class="page-title">Yönetim Paneli</h1>
 
-        <!-- Proje Yönetimi -->
-        <div class="admin-section">
-            <h3>💻 Yeni Proje Ekle (`network.html`)</h3>
-            <input type="text" id="projTitle" class="admin-input" placeholder="Proje Adı">
-            <input type="text" id="projDesc" class="admin-input" placeholder="Proje Açıklaması">
-            <input type="text" id="projLink" class="admin-input" placeholder="İnceleme Linki URL">
-            <button class="admin-btn" onclick="addProject()">Projeyi Ekle</button>
-        </div>
-        <div class="admin-section">
-            <h3>📂 Mevcut Projeler Listesi</h3>
-            <div id="adminProjectsList" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: var(--text-muted); text-align: center;">Projeler yükleniyor...</p>
-            </div>
-        </div>
-
-        <!-- Uygulama / Dosya İndirme Yönetimi -->
-        <div class="admin-section">
-            <h3>📥 Siteye Dosya Yükle / Uygulama Ekle (`downloads.html`)</h3>
-            <input type="text" id="appName" class="admin-input" placeholder="Uygulama / Dosya Adı">
-            <input type="text" id="appDesc" class="admin-input" placeholder="Kısa Açıklama">
-            <input type="text" id="appVersion" class="admin-input" placeholder="Sürüm (Örn: v1.0)">
-            
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-size: 13px; color: var(--text-muted);">Seçenek A: Bilgisayardan Dosya Yükle (.zip, .exe, .rar vb.)</label>
-                <input type="file" id="appFile" class="admin-input" style="padding: 10px;">
+            <!-- 1. KEY SİSTEMİ YÖNETİMİ -->
+            <div class="admin-card">
+                <h3>Key Şifresini Değiştir</h3>
+                <div class="form-group">
+                    <label>Yeni Geçerli Key:</label>
+                    <input type="text" id="newKeyInput" class="form-control" placeholder="Örn: KLAKZ-YENI-KEY">
+                </div>
+                <button class="btn" onclick="updateKey()">Key'i Güncelle</button>
             </div>
 
-            <div style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: bold;">--- VEYA ---</div>
-
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <label style="font-size: 13px; color: var(--text-muted);">Seçenek B: Harici İndirme Linki Yapıştır</label>
-                <input type="text" id="appLink" class="admin-input" placeholder="https://... (Dosya seçmezsen bu link kullanılır)">
+            <!-- 2. SİSTEM DURUMU (STATUS) YÖNETİMİ -->
+            <div class="admin-card">
+                <h3>Sistem Durumunu Değiştir (Status)</h3>
+                <div class="form-group">
+                    <label>Ana Hub API Durumu:</label>
+                    <select id="statusApi" class="form-control">
+                        <option value="ÇEVRİMİÇİ">Çevrimiçi</option>
+                        <option value="BAKIMDA">Bakımda</option>
+                        <option value="ÇEVRİMDIŞI">Çevrimdışı</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="updateStatus()">Durumu Güncelle</button>
             </div>
 
-            <button class="admin-btn" onclick="addApp()">Uygulamayı Yayınla</button>
-        </div>
-        <div class="admin-section">
-            <h3>📂 Mevcut Uygulamalar Listesi</h3>
-            <div id="adminAppsList" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: var(--text-muted); text-align: center;">Uygulamalar yükleniyor...</p>
-            </div>
-        </div>
-
-        <!-- Script Yönetimi -->
-        <div class="admin-section">
-            <h3>➕ Yeni Script Ekle</h3>
-            <input type="text" id="scriptTitle" class="admin-input" placeholder="Oyun / Script Adı">
-            <input type="text" id="scriptDesc" class="admin-input" placeholder="Kısa Açıklama">
-            <input type="text" id="scriptImage" class="admin-input" placeholder="Görsel URL (İsteğe bağlı)">
-            <textarea id="scriptCode" class="admin-input" style="resize: vertical; min-height: 80px;" placeholder="Lua Script Kodu..."></textarea>
-            <button class="admin-btn" onclick="addScript()">Scripti Yayınla</button>
-        </div>
-        <div class="admin-section">
-            <h3>📋 Mevcut Scriptleri Yönet / Sil</h3>
-            <div id="adminScriptsList" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: var(--text-muted); text-align: center;">Scriptler yükleniyor...</p>
-            </div>
-        </div>
-
-        <!-- Executor Yönetimi -->
-        <div class="admin-section">
-            <h3>🚀 Yeni Executor Ekle</h3>
-            <input type="text" id="execName" class="admin-input" placeholder="Executor Adı">
-            <input type="text" id="execDesc" class="admin-input" placeholder="Kısa Açıklama">
-            <input type="text" id="execLink" class="admin-input" placeholder="İndirme Linki URL">
-            <input type="text" id="execImage" class="admin-input" placeholder="Logo URL">
-            <button class="admin-btn" onclick="addExecutor()">Executor Ekle</button>
-        </div>
-        <div class="admin-section">
-            <h3>📂 Mevcut Executor Listesi</h3>
-            <div id="adminExecutorsList" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: var(--text-muted); text-align: center;">Executorlar yükleniyor...</p>
-            </div>
-        </div>
-
-        <!-- Durum Yönetimi -->
-        <div class="admin-section">
-            <h3>🟢 Sistem Durumu Ekle</h3>
-            <input type="text" id="statusName" class="admin-input" placeholder="Servis Adı">
-            <select id="statusState" class="admin-input">
-                <option value="Çalışıyor (Working)">Çalışıyor (Working)</option>
-                <option value="Güncelleniyor (Updating)">Güncelleniyor (Updating)</option>
-                <option value="Patlak (Patched)">Patlak (Patched)</option>
-            </select>
-            <button class="admin-btn" onclick="addStatus()">Durum Ekle / Güncelle</button>
-        </div>
-        <div class="admin-section">
-            <h3>📊 Mevcut Durum Listesi</h3>
-            <div id="adminStatusList" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: var(--text-muted); text-align: center;">Durumlar yükleniyor...</p>
-            </div>
-        </div>
-
-        <!-- İstekler -->
-        <div class="admin-section">
-            <h3>📥 Kullanıcı Script İstekleri</h3>
-            <div id="requestsList" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="color: var(--text-muted); text-align: center;">İstek yok.</p>
+            <!-- 3. YENİ SCRİPT EKLEME -->
+            <div class="admin-card">
+                <h3>Yeni Script Ekle</h3>
+                <div class="form-group">
+                    <label>Script Adı:</label>
+                    <input type="text" id="scriptTitle" class="form-control" placeholder="Örn: Hub V2">
+                </div>
+                <div class="form-group">
+                    <label>Açıklama:</label>
+                    <input type="text" id="scriptDesc" class="form-control" placeholder="Script açıklaması...">
+                </div>
+                <div class="form-group">
+                    <label>Loadstring / Kod:</label>
+                    <input type="text" id="scriptCode" class="form-control" placeholder="loadstring(...)()">
+                </div>
+                <button class="btn" onclick="addNewScript()">Scripti Ekle</button>
             </div>
         </div>
     </div>
 
-    <div id="toast">Bildirim mesajı</div>
-    <footer><p>&copy; 2026 Klakz Hub. Tüm hakları saklıdır.</p></footer>
-
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJuMNSxWFuNTO0xGriUo8QoaC9g-ie8WM",
-            authDomain: "klakz-database.firebaseapp.com",
-            databaseURL: "https://klakz-database-default-rtdb.firebaseio.com",
-            projectId: "klakz-database",
-            storageBucket: "klakz-database.firebasestorage.app",
-            messagingSenderId: "437747915577",
-            appId: "1:437747915577:web:f4ffa2f76d6d7a923966e8"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const storage = firebase.storage();
+        // Varsayılan Admin Şifresi (İstediğin gibi değiştirebilirsin)
+        const ADMIN_SECRET = "klakz123";
 
-        db.ref('announcement').on('value', snap => {
-            let val = snap.val() || "";
-            document.getElementById('topAnnouncement').textContent = val;
-            document.getElementById('announcementInput').value = val;
-        });
-
-        db.ref('validKeys').on('value', snap => {
-            const data = snap.val();
-            const list = document.getElementById('adminKeysList');
-            list.innerHTML = "";
-            if(!data) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Kayıtlı key yok.</p>'; return; }
-            Object.keys(data).forEach(id => {
-                list.innerHTML += `<div class="list-item"><strong style="color: var(--accent); font-family: monospace;">${data[id]}</strong><button class="admin-btn admin-btn-danger" style="padding: 8px 14px; font-size: 12px;" onclick="deleteData('validKeys', '${id}')">Sil</button></div>`;
-            });
-        });
-
-        db.ref('projects').on('value', snap => {
-            const data = snap.val();
-            const list = document.getElementById('adminProjectsList');
-            list.innerHTML = "";
-            if(!data) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Kayıtlı proje yok.</p>'; return; }
-            Object.keys(data).forEach(id => {
-                list.innerHTML += `<div class="list-item"><strong style="color: white;">${data[id].title}</strong><button class="admin-btn admin-btn-danger" style="padding: 8px 14px; font-size: 12px;" onclick="deleteData('projects', '${id}')">Sil</button></div>`;
-            });
-        });
-
-        db.ref('downloads').on('value', snap => {
-            const data = snap.val();
-            const list = document.getElementById('adminAppsList');
-            list.innerHTML = "";
-            if(!data) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Kayıtlı uygulama yok.</p>'; return; }
-            Object.keys(data).forEach(id => {
-                list.innerHTML += `<div class="list-item"><strong style="color: white;">${data[id].name} <span style="font-size: 12px; color: var(--primary);">(${data[id].version})</span></strong><button class="admin-btn admin-btn-danger" style="padding: 8px 14px; font-size: 12px;" onclick="deleteData('downloads', '${id}')">Sil</button></div>`;
-            });
-        });
-
-        db.ref('scripts').on('value', snap => {
-            const data = snap.val();
-            const list = document.getElementById('adminScriptsList');
-            list.innerHTML = "";
-            if(!data) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Kayıtlı script yok.</p>'; return; }
-            Object.keys(data).forEach(id => {
-                list.innerHTML += `<div class="list-item"><strong style="color: white;">${data[id].title}</strong><button class="admin-btn admin-btn-danger" style="padding: 8px 14px; font-size: 12px;" onclick="deleteData('scripts', '${id}')">Sil</button></div>`;
-            });
-        });
-
-        db.ref('executors').on('value', snap => {
-            const data = snap.val();
-            const list = document.getElementById('adminExecutorsList');
-            list.innerHTML = "";
-            if(!data) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Kayıtlı executor yok.</p>'; return; }
-            Object.keys(data).forEach(id => {
-                list.innerHTML += `<div class="list-item"><strong style="color: white;">${data[id].name}</strong><button class="admin-btn admin-btn-danger" style="padding: 8px 14px; font-size: 12px;" onclick="deleteData('executors', '${id}')">Sil</button></div>`;
-            });
-        });
-
-        db.ref('statuses').on('value', snap => {
-            const data = snap.val();
-            const list = document.getElementById('adminStatusList');
-            list.innerHTML = "";
-            if(!data) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Kayıtlı durum yok.</p>'; return; }
-            Object.keys(data).forEach(id => {
-                list.innerHTML += `<div class="list-item"><div><strong style="color: white;">${data[id].name}</strong> <span style="font-size: 12px; color: var(--primary);">[${data[id].state}]</span></div><button class="admin-btn admin-btn-danger" style="padding: 8px 14px; font-size: 12px;" onclick="deleteData('statuses', '${id}')">Sil</button></div>`;
-            });
-        });
-
-        db.ref('requests').on('value', snap => {
-            const data = snap.val();
-            const list = document.getElementById('requestsList');
-            list.innerHTML = "";
-            if(!data) { list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">İstek yok.</p>'; return; }
-            Object.keys(data).forEach(id => {
-                list.innerHTML += `<div class="list-item"><div><strong style="color: white;">${data[id].game}</strong><p style="color: var(--text-muted); font-size: 13px;">${data[id].details}</p></div><button class="admin-btn admin-btn-danger" style="padding: 8px 14px; font-size: 12px;" onclick="deleteData('requests', '${id}')">Sil</button></div>`;
-            });
-        });
-
-        function updateAnnouncement() {
-            db.ref('announcement').set(document.getElementById('announcementInput').value).then(() => showToast("✅ Duyuru güncellendi!"));
-        }
-
-        function generateKey() {
-            let customKey = document.getElementById('keyInput').value.trim();
-            let newKey = customKey !== "" ? customKey : "KLAKZ-" + Math.random().toString(36).substring(2, 8).toUpperCase() + "-" + Math.floor(1000 + Math.random() * 9000);
-            db.ref('validKeys').push(newKey).then(() => { showToast("🔑 Key üretildi!"); document.getElementById('keyInput').value = ""; });
-        }
-
-        function addProject() {
-            let title = document.getElementById('projTitle').value.trim();
-            let desc = document.getElementById('projDesc').value.trim();
-            let link = document.getElementById('projLink').value.trim();
-            if(!title || !link) { showToast("❌ Proje adı ve linki zorunludur!"); return; }
-            db.ref('projects').push({ title, desc, link }).then(() => { showToast("✅ Proje eklendi!"); document.getElementById('projTitle').value=""; document.getElementById('projDesc').value=""; document.getElementById('projLink').value=""; });
-        }
-
-        function addApp() {
-            let name = document.getElementById('appName').value.trim();
-            let desc = document.getElementById('appDesc').value.trim();
-            let link = document.getElementById('appLink').value.trim();
-            let version = document.getElementById('appVersion').value.trim() || "v1.0";
-            let fileInput = document.getElementById('appFile');
-            
-            if(!name) { showToast("❌ Lütfen uygulama adı girin!"); return; }
-
-            if(fileInput.files.length > 0) {
-                let file = fileInput.files[0];
-                let storageRef = storage.ref('uploads/' + Date.now() + '_' + file.name);
-                showToast("⏳ Dosya yükleniyor, lütfen bekleyin...");
-                
-                storageRef.put(file).then(snapshot => {
-                    snapshot.ref.getDownloadURL().then(downloadURL => {
-                        db.ref('downloads').push({ name, desc, link: downloadURL, version, fileName: file.name, fileSize: (file.size / (1024*1024)).toFixed(2) + " MB" }).then(() => {
-                            showToast("✅ Dosya başarıyla yüklendi ve yayınlandı!");
-                            document.getElementById('appName').value=""; document.getElementById('appDesc').value=""; document.getElementById('appLink').value=""; document.getElementById('appVersion').value=""; fileInput.value="";
-                        });
-                    });
-                }).catch(error => {
-                    showToast("❌ Dosya yükleme hatası: " + error.message);
-                });
-            } else if(link) {
-                db.ref('downloads').push({ name, desc, link, version }).then(() => {
-                    showToast("✅ Uygulama eklendi!");
-                    document.getElementById('appName').value=""; document.getElementById('appDesc').value=""; document.getElementById('appLink').value=""; document.getElementById('appVersion').value="";
-                });
+        function checkAdminPassword() {
+            let pass = document.getElementById('adminPassword').value;
+            if (pass === ADMIN_SECRET) {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
             } else {
-                showToast("❌ Lütfen bir dosya seçin ya da harici bir link girin!");
+                document.getElementById('loginError').style.display = 'block';
             }
         }
 
-        function addScript() {
-            let title = document.getElementById('scriptTitle').value.trim();
-            let desc = document.getElementById('scriptDesc').value.trim();
-            let image = document.getElementById('scriptImage').value.trim();
-            let code = document.getElementById('scriptCode').value.trim();
-            if(!title || !code) { showToast("❌ Oyun adı ve script kodu zorunludur!"); return; }
-            db.ref('scripts').push({ title, desc, image, code }).then(() => { showToast("✅ Script eklendi!"); document.getElementById('scriptTitle').value=""; document.getElementById('scriptDesc').value=""; document.getElementById('scriptImage').value=""; document.getElementById('scriptCode').value=""; });
+        // Key Güncelleme Fonksiyonu
+        function updateKey() {
+            let newKey = document.getElementById('newKeyInput').value.trim();
+            if (newKey) {
+                localStorage.setItem("klakz_correct_key", newKey);
+                alert("Key başarıyla güncellendi: " + newKey);
+                document.getElementById('newKeyInput').value = '';
+            } else {
+                alert("Lütfen geçerli bir key yazın!");
+            }
         }
 
-        function addExecutor() {
-            let name = document.getElementById('execName').value.trim();
-            let desc = document.getElementById('execDesc').value.trim();
-            let link = document.getElementById('execLink').value.trim();
-            let image = document.getElementById('execImage').value.trim();
-            if(!name || !link) { showToast("❌ Ad ve link zorunludur!"); return; }
-            db.ref('executors').push({ name, desc, link, image }).then(() => { showToast("✅ Executor eklendi!"); document.getElementById('execName').value=""; document.getElementById('execDesc').value=""; document.getElementById('execLink').value=""; document.getElementById('execImage').value=""; });
+        // Status Güncelleme Fonksiyonu
+        function updateStatus() {
+            let apiStatus = document.getElementById('statusApi').value;
+            localStorage.setItem("klakz_status_api", apiStatus);
+            alert("Sistem durumu güncellendi: " + apiStatus);
         }
 
-        function addStatus() {
-            let name = document.getElementById('statusName').value.trim();
-            let state = document.getElementById('statusState').value;
-            if(!name) { showToast("❌ İsim boş olamaz!"); return; }
-            db.ref('statuses').push({ name, state }).then(() => { showToast("✅ Durum eklendi!"); document.getElementById('statusName').value=""; });
-        }
+        // Script Ekleme Fonksiyonu
+        function addNewScript() {
+            let title = document.getElementById('scriptTitle').value;
+            let desc = document.getElementById('scriptDesc').value;
+            let code = document.getElementById('scriptCode').value;
 
-        function deleteData(path, id) { db.ref(path + '/' + id).remove().then(() => showToast("🗑️ Silindi.")); }
-
-        function toggleMenu() { document.querySelector('nav').classList.toggle('active'); }
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            if (title && desc && code) {
+                let scripts = JSON.parse(localStorage.getItem("klakz_custom_scripts")) || [];
+                scripts.push({ title, desc, code });
+                localStorage.setItem("klakz_custom_scripts", JSON.stringify(scripts));
+                
+                alert("Yeni script başarıyla eklendi!");
+                document.getElementById('scriptTitle').value = '';
+                document.getElementById('scriptDesc').value = '';
+                document.getElementById('scriptCode').value = '';
+            } else {
+                alert("Lütfen tüm alanları doldurun!");
+            }
         }
     </script>
 </body>
