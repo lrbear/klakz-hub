@@ -35,20 +35,41 @@
         nav a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: 0.3s; position: relative; padding: 5px 0; }
         nav a:hover, nav a.active { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
 
-        .container { max-width: 600px; margin: 80px auto; padding: 0 20px; text-align: center; }
+        .container { max-width: 600px; margin: 60px auto; padding: 0 20px; text-align: center; }
         .key-box {
             background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 40px;
             backdrop-filter: blur(15px); box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
         }
-        .key-box h1 { font-size: 28px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .key-box p { color: var(--text-secondary); margin-bottom: 30px; font-size: 16px; }
+        .key-box h1 { font-size: 26px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .key-box p { color: var(--text-secondary); margin-bottom: 25px; font-size: 15px; }
 
         .btn {
-            padding: 14px 35px; border-radius: 8px; font-weight: bold; text-decoration: none; cursor: pointer; transition: 0.3s;
+            padding: 12px 30px; border-radius: 8px; font-weight: bold; text-decoration: none; cursor: pointer; transition: 0.3s;
             background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple)); color: #fff; border: none;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: inline-block; font-size: 16px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); display: inline-block; font-size: 15px; margin-bottom: 20px;
         }
-        .btn:hover { box-shadow: 0 0 25px var(--neon-blue), 0 0 35px var(--neon-purple); transform: scale(1.05); }
+        .btn:hover { box-shadow: 0 0 25px var(--neon-blue), 0 0 35px var(--neon-purple); transform: scale(1.03); }
+
+        .btn-discord {
+            background: #5865F2;
+            box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
+            margin-bottom: 25px;
+        }
+        .btn-discord:hover {
+            box-shadow: 0 0 25px #5865F2;
+        }
+
+        .divider {
+            height: 1px; width: 100%; background: var(--border-color); margin: 20px 0;
+        }
+
+        .key-input {
+            width: 100%; padding: 14px 20px; background: rgba(5, 5, 10, 0.6); border: 1px solid var(--border-color);
+            border-radius: 8px; color: #fff; font-size: 16px; margin-bottom: 15px; outline: none; text-align: center; transition: 0.3s;
+        }
+        .key-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+
+        .error-msg { color: #ff3366; font-size: 14px; margin-top: 10px; display: none; text-shadow: 0 0 10px rgba(255,51,102,0.4); }
     </style>
 </head>
 <body>
@@ -67,10 +88,41 @@
 
     <div class="container">
         <div class="key-box">
-            <h1>Anahtar Doğrulama / Alma</h1>
-            <p>Scriptleri kullanabilmek için geçerli bir anahtara ihtiyacın var. Aşağıdaki butona tıklayarak anahtarınızı edinebilirsiniz.</p>
-            <a href="#" class="btn" onclick="alert('Key alma sayfasına yönlendiriliyorsunuz!')">KEY AL</a>
+            <h1>Key Doğrulama Sistemi</h1>
+            <p>Scriptlere erişim sağlamak için önce Discord sunucumuzdan anahtar almanız gerekmektedir.</p>
+            
+            <!-- Discord'a Yönlendirme Butonu (Buraya kendi Discord davet linkini yazabilirsin) -->
+            <a href="https://discord.gg/senin-discord-davet-linkin" target="_blank" class="btn btn-discord">1. Discord'a Git & Key Al</a>
+
+            <div class="divider"></div>
+
+            <p style="margin-bottom: 15px;">Aldığın Key'i buraya gir ve kilidi aç:</p>
+            
+            <input type="text" id="keyInput" class="key-input" placeholder="Key'i buraya yapıştır...">
+            <button class="btn" onclick="checkKey()">Key'i Doğrula</button>
+            
+            <div id="errorMsg" class="error-msg">Geçersiz veya hatalı key! Lütfen tekrar dene.</div>
         </div>
     </div>
+
+    <script>
+        function checkKey() {
+            const userKey = document.getElementById('keyInput').value.trim();
+            const correctKey = "KLAKZ-2026-SECRET"; // Buraya geçerli olmasını istediğin anahtarı yazabilirsin
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (userKey === correctKey) {
+                // Key doğruysa tarayıcı hafızasına yetki verildiğini kaydet ve script sayfasına at
+                localStorage.setItem("klakz_verified", "true");
+                window.location.href = "script.html";
+            } else {
+                // Key yanlışsa hata mesajını göster
+                errorMsg.style.display = "block";
+                setTimeout(() => {
+                    errorMsg.style.display = "none";
+                }, 3000);
+            }
+        }
+    </script>
 </body>
 </html>
