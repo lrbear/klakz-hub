@@ -84,20 +84,20 @@ SubmitBtn.MouseButton1Click:Connect(function()
                LoadingSubtitle = "by Klakz",
                Theme = "Default",
                ConfigurationSaving = { Enabled = false },
-               Discord = { Enabled = false, Invite = "noinvite" },
+               Discord = { Enabled = true, Invite = "https://discord.gg/w5cJdnTkF" },
                KeySystem = false
             })
 
             -- Ana Sekme (Scriptler)
             local MainTab = Window:CreateTab("Scriptler", 4483362458)
-            local MainSection = MainTab:CreateSection("Genel Araçlar")
+            local MainSection = MainTab:CreateSection("Genel scriptler")
 
             -- Infinite Yield (Admin)
             MainTab:CreateButton({
-               Name = "Infinite Yield (Admin)",
+               Name = "Infinite Yield (Admin) bakımda",
                Callback = function()
                    pcall(function()
-                       loadstring(game:HttpGet("https://obj.wearedevs.net/2/scripts/Infinite%20Yield.lua"))()
+                       loadstring(game:ttpGet("https://obj.wearedevs.net/2/scripts/Infinite%20Yield.lua"))()
                    end)
                end,
             })
