@@ -24,7 +24,7 @@ local KeyTitle = Instance.new("TextLabel")
 KeyTitle.Size = UDim2.new(1, 0, 0, 40)
 KeyTitle.BackgroundTransparency = 1
 KeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-KeyTitle.Text = "Klakz Hub - Online Key (Orion)"
+KeyTitle.Text = "Klakz Hub - Online Key"
 KeyTitle.TextSize = 16
 KeyTitle.Font = Enum.Font.SourceSansBold
 KeyTitle.Parent = KeyFrame
@@ -75,52 +75,33 @@ SubmitBtn.MouseButton1Click:Connect(function()
         if userInput == remoteKey then
             KeyGui:Destroy()
             
-            -- Orion Library Kütüphanesini Yükleme
-            local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+            -- Rayfield UI Kütüphanesini Yükleme
+            local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-            local Window = OrionLib:MakeWindow({
-                Name = "Klakz Hub | Pro Edition",
-                HidePremium = false,
-                SaveConfig = true,
-                ConfigFolder = "KlakzHubOrion",
-                IntroText = "Klakz Hub Yükleniyor..."
+            local Window = Rayfield:CreateWindow({
+                Name = "Klakz Hub",
+                LoadingTitle = "Klakz Hub Yükleniyor...",
+                LoadingSubtitle = "by Klakz",
+                Theme = "Default",
+                ConfigurationSaving = {
+                    Enabled = true,
+                    FolderName = "KlakzHub",
+                    FileName = "Config"
+                },
+                Discord = {
+                    Enabled = true,
+                    Invite = "w5cJdnTkF",
+                    RememberJoins = true
+                },
+                KeySystem = false
             })
 
             -- 1. Scriptler Sekmesi
-            local MainTab = Window:MakeTab({
-                Name = "Scriptler",
-                Icon = "rbxassetid://4483345998",
-                PremiumOnly = false
-            })
-
-            MainTab:AddParagraph("Arama ve Filtreleme", "Aşağıdaki kutuya aradığın scriptin adını yazarak filtreleyebilirsin.")
-
-            -- Dinamik Arama Kutusu (Textbox)
-            local allScriptButtons = {}
+            local MainTab = Window:CreateTab("Scriptler", 4483362458)
             
-            MainTab:AddTextbox({
-                Name = "Script Ara...",
-                Default = "",
-                TextDisappear = false,
-                Callback = function(Value)
-                    local searchText = Value:lower()
-                    for name, btnObj in pairs(allScriptButtons) do
-                        if name:find(searchText) or searchText == "" then
-                            btnObj.Visible = true
-                        else
-                            btnObj.Visible = false
-                        end
-                    end
-                end
-            })
+            MainTab:CreateSection("Dans Scriptleri")
 
-            MainTab:AddParagraph("Dans Scriptleri", "Popüler FE dans menüleri.")
-
-            local function registerButton(name, btnObject)
-                allScriptButtons[name:lower()] = btnObject
-            end
-
-            local btn1 = MainTab:AddButton({
+            MainTab:CreateButton({
                 Name = "Nothing Emotes (FE Dans Menüsü)",
                 Callback = function()
                     pcall(function()
@@ -128,11 +109,10 @@ SubmitBtn.MouseButton1Click:Connect(function()
                     end)
                 end,
             })
-            registerButton("Nothing Emotes (FE Dans Menüsü)", btn1)
 
-            MainTab:AddParagraph("Genel Scriptler", "Yararlı harici araçlar.")
+            MainTab:CreateSection("Genel Scriptler")
 
-            local btn2 = MainTab:AddButton({
+            MainTab:CreateButton({
                 Name = "Infinite Yield (Admin) - Bakımda",
                 Callback = function()
                     pcall(function()
@@ -140,9 +120,8 @@ SubmitBtn.MouseButton1Click:Connect(function()
                     end)
                 end,
             })
-            registerButton("Infinite Yield (Admin) - Bakımda", btn2)
 
-            local btn3 = MainTab:AddButton({
+            MainTab:CreateButton({
                 Name = "Speed / Araç Scripti",
                 Callback = function()
                     pcall(function()
@@ -150,9 +129,8 @@ SubmitBtn.MouseButton1Click:Connect(function()
                     end)
                 end,
             })
-            registerButton("Speed / Araç Scripti", btn3)
 
-            MainTab:AddParagraph("Oyun Scriptleri", "Oyuna özel özel scriptler.")
+            MainTab:CreateSection("Oyun Scriptleri")
 
             local games = {
                 {Name = "Be a NPC or DIE!", Url = "https://rawscripts.net/raw/FIRE-Be-NPC-or-DIE!-OP-Script-26413"},
@@ -165,7 +143,7 @@ SubmitBtn.MouseButton1Click:Connect(function()
             }
 
             for _, gameInfo in ipairs(games) do
-                local gameBtn = MainTab:AddButton({
+                MainTab:CreateButton({
                     Name = gameInfo.Name,
                     Callback = function()
                         pcall(function()
@@ -173,24 +151,20 @@ SubmitBtn.MouseButton1Click:Connect(function()
                         end)
                     end,
                 })
-                registerButton(gameInfo.Name, gameBtn)
             end
 
-            -- 2. Oyuncu Sekmesi
-            local PlayerTab = Window:MakeTab({
-                Name = "Oyuncu & Dünya",
-                Icon = "rbxassetid://4483345998",
-                PremiumOnly = false
-            })
+            -- 2. Oyuncu Sekmesi (Fly, Noclip, Fling, Hız, Zıplama)
+            local PlayerTab = Window:CreateTab("Oyuncu", 4483345998)
 
-            PlayerTab:AddSlider({
+            PlayerTab:CreateSection("Hareket ve Fizik")
+
+            PlayerTab:CreateSlider({
                 Name = "Karakter Hızı (WalkSpeed)",
-                Min = 16,
-                Max = 250,
-                Default = 16,
-                Color = Color3.fromRGB(255,255,255),
+                Range = {16, 250},
                 Increment = 1,
-                ValueName = "Hız",
+                Suffix = "Hız",
+                CurrentValue = 16,
+                Flag = "SpeedSlider",
                 Callback = function(Value)
                     pcall(function()
                         game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = Value
@@ -198,14 +172,13 @@ SubmitBtn.MouseButton1Click:Connect(function()
                 end,
             })
 
-            PlayerTab:AddSlider({
+            PlayerTab:CreateSlider({
                 Name = "Zıplama Gücü (JumpPower)",
-                Min = 50,
-                Max = 300,
-                Default = 50,
-                Color = Color3.fromRGB(255,255,255),
+                Range = {50, 300},
                 Increment = 1,
-                ValueName = "Güç",
+                Suffix = "Güç",
+                CurrentValue = 50,
+                Flag = "JumpSlider",
                 Callback = function(Value)
                     pcall(function()
                         local humanoid = game:GetService("Players").LocalPlayer.Character.Humanoid
@@ -215,27 +188,15 @@ SubmitBtn.MouseButton1Click:Connect(function()
                 end,
             })
 
-            PlayerTab:AddSlider({
-                Name = "Görüş Açısı (FOV)",
-                Min = 70,
-                Max = 120,
-                Default = 70,
-                Color = Color3.fromRGB(255,255,255),
-                Increment = 1,
-                ValueName = "FOV",
-                Callback = function(Value)
-                    pcall(function()
-                        workspace.CurrentCamera.FieldOfView = Value
-                    end)
-                end,
-            })
+            PlayerTab:CreateSection("Özel Yetenekler (Fly, Noclip, Fling)")
 
             -- Fly (Uçma) Toggle
             local flying = false
             local flyConnection
-            PlayerTab:AddToggle({
+            PlayerTab:CreateToggle({
                 Name = "Uçma (Fly)",
-                Default = false,
+                CurrentValue = false,
+                Flag = "FlyToggle",
                 Callback = function(Value)
                     flying = Value
                     local player = game:GetService("Players").LocalPlayer
@@ -271,9 +232,10 @@ SubmitBtn.MouseButton1Click:Connect(function()
             -- Noclip Toggle
             local noclipEnabled = false
             local noclipConnection
-            PlayerTab:AddToggle({
+            PlayerTab:CreateToggle({
                 Name = "Duvarlardan Geçme (Noclip)",
-                Default = false,
+                CurrentValue = false,
+                Flag = "NoclipToggle",
                 Callback = function(Value)
                     noclipEnabled = Value
                     local player = game:GetService("Players").LocalPlayer
@@ -296,51 +258,8 @@ SubmitBtn.MouseButton1Click:Connect(function()
                 end,
             })
 
-            -- Fullbright Toggle
-            PlayerTab:AddToggle({
-                Name = "Gece Görüşü (Fullbright)",
-                Default = false,
-                Callback = function(Value)
-                    pcall(function()
-                        local lighting = game:GetService("Lighting")
-                        if Value then
-                            lighting.Brightness = 2
-                            lighting.ClockTime = 14
-                            lighting.FogEnd = 100000
-                            lighting.GlobalShadows = false
-                        else
-                            lighting.Brightness = 1
-                            lighting.ClockTime = 0
-                            lighting.GlobalShadows = true
-                        end
-                    end)
-                end,
-            })
-
-            -- Click TP Toggle
-            local clickTpEnabled = false
-            local mouse = game:GetService("Players").LocalPlayer:GetMouse()
-            PlayerTab:AddToggle({
-                Name = "Click TP (Ctrl + Fare ile Işınlan)",
-                Default = false,
-                Callback = function(Value)
-                    clickTpEnabled = Value
-                end,
-            })
-
-            mouse.Button1Down:Connect(function()
-                if clickTpEnabled and game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftControl) then
-                    pcall(function()
-                        local char = game:GetService("Players").LocalPlayer.Character
-                        if char and char:FindFirstChild("HumanoidRootPart") then
-                            char.HumanoidRootPart.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0))
-                        end
-                    end)
-                end
-            end)
-
-            -- Fling Butonu
-            PlayerTab:AddButton({
+            -- Fling Butonu (Etraftakileri Fırlatma)
+            PlayerTab:CreateButton({
                 Name = "Fling (Yakınındakileri Fırlat)",
                 Callback = function()
                     pcall(function()
@@ -362,27 +281,15 @@ SubmitBtn.MouseButton1Click:Connect(function()
             })
 
             -- 3. Ayarlar Sekmesi
-            local SettingsTab = Window:MakeTab({
-                Name = "Ayarlar",
-                Icon = "rbxassetid://6023426915",
-                PremiumOnly = false
-            })
-
-            SettingsTab:AddDropdown({
-                Name = "Arayüz Teması",
-                Default = "Default",
-                Options = {"Default", "Dark", "Blood", "Ocean", "Serenity"},
-                Callback = function(Value)
-                    pcall(function()
-                        OrionLib:SetTheme(Value)
-                    end)
-                end,
-            })
+            local SettingsTab = Window:CreateTab("Ayarlar", 6023426915)
+            
+            SettingsTab:CreateSection("Performans ve Görünüm")
 
             local fpsConnection
-            SettingsTab:AddToggle({
+            SettingsTab:CreateToggle({
                 Name = "FPS Göstergesi (Ekranın Köşesinde)",
-                Default = false,
+                CurrentValue = false,
+                Flag = "FpsToggle",
                 Callback = function(Value)
                     if Value then
                         local CoreGui = game:GetService("CoreGui")
@@ -430,7 +337,9 @@ SubmitBtn.MouseButton1Click:Connect(function()
                 end,
             })
 
-            SettingsTab:AddButton({
+            SettingsTab:CreateSection("Arayüz Araçları")
+
+            SettingsTab:CreateButton({
                 Name = "Made in Turkey",
                 Callback = function()
                     local chatSuccess = pcall(function()
@@ -444,19 +353,26 @@ SubmitBtn.MouseButton1Click:Connect(function()
                 end,
             })
 
-            SettingsTab:AddButton({
+            SettingsTab:CreateButton({
                 Name = "Bildirim Testi",
                 Callback = function()
-                    OrionLib:MakeNotification({
+                    Rayfield:Notify({
                         Title = "Klakz Hub",
                         Content = "Bildirim sistemi aktif ve sorunsuz çalışıyor!",
-                        Image = "rbxassetid://4483345998",
-                        Time = 5
+                        Duration = 3,
+                        Image = 4483362458,
                     })
                 end,
             })
 
-            OrionLib:Init()
+            SettingsTab:CreateButton({
+                Name = "Menüyü Kapat",
+                Callback = function()
+                    Rayfield:Destroy()
+                end,
+            })
+
+            Rayfield:LoadConfiguration()
         else
             SubmitBtn.Text = "Key'i Kontrol Et"
             TextBox.Text = ""
